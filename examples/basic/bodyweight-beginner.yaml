@@ -1,0 +1,71 @@
+program_name: Simple Full Body Routine
+description: "Basic 3-day full body routine for beginners"
+frequency: "3 days per week"
+duration: "4 weeks"
+
+workouts:
+  - name: Workout A
+    focus: "Full Body"
+    exercises:
+      - name: Bodyweight Squat
+        sets: 3
+        reps: 8
+        weight: "bodyweight"
+        rest: "60sec"
+        notes: "Focus on proper form and depth"
+        substitutes: ["Chair-assisted squat"]
+
+      - name: Push-up
+        sets: 3
+        reps: 5
+        weight: "bodyweight"
+        rest: "60sec"
+        notes: "Modify on knees if needed"
+        substitutes: ["Incline push-up", "Wall push-up"]
+
+      - name: Plank
+        sets: 2
+        reps: "30sec"
+        weight: "bodyweight"
+        rest: "45sec"
+        notes: "Keep straight line from head to heels"
+        substitutes: ["Knee plank"]
+
+  - name: Workout B
+    focus: "Full Body"
+    exercises:
+      - name: Glute Bridge
+        sets: 3
+        reps: 10
+        weight: "bodyweight"
+        rest: "45sec"
+        notes: "Squeeze glutes at the top"
+        substitutes: ["Single-leg glute bridge"]
+
+      - name: Pike Walk
+        sets: 2
+        reps: 8
+        weight: "bodyweight"
+        rest: "60sec"
+        notes: "Walk hands forward and back"
+        substitutes: ["Mountain climber"]
+
+      - name: Side Plank
+        sets: 2
+        reps: "20 e/s"
+        weight: "bodyweight"
+        rest: "30sec"
+        notes: "Keep hips lifted"
+        substitutes: ["Modified side plank"]
+
+equipment_needed:
+  primary: ["None - bodyweight only"]
+  
+progression:
+  type: "linear"
+  notes: "Add 1-2 reps per exercise each week"
+
+notes:
+  - "Perfect for beginners or home workouts"
+  - "Focus on movement quality over speed"
+  - "Rest 1 day between workouts"

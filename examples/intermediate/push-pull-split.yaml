@@ -1,0 +1,118 @@
+program_name: Advanced Push/Pull Split
+description: "Intermediate program showcasing complex features"
+frequency: "4 days per week"
+duration: "8 weeks"
+
+workouts:
+  - name: Push Day
+    focus: "Push"
+    exercises:
+      - name: Bench Press
+        sets: 4
+        reps: 5
+        weight: "80kg"
+        rest: "3min"
+        notes: "Focus on controlled descent"
+        substitutes: ["Dumbbell press", "Push-up variation"]
+
+      - name: Incline Dumbbell Press
+        sets: 3
+        reps: "8-10"
+        weight: "25kg"
+        rest: "2min"
+        notes: "45-degree bench angle"
+        substitutes: ["Incline barbell press"]
+
+      - name: Seated Dumbbell Shoulder Press
+        sets: 3
+        reps: 8
+        weight: "20kg"
+        rest: "90sec"
+        substitutes: ["Standing press", "Pike push-up"]
+
+      - name: Lateral Raises
+        sets: 3
+        reps: 15
+        weight: "8kg"
+        rest: "60sec"
+        notes: "Control the negative"
+        substitutes: ["Band lateral raises"]
+
+      # Dropset example
+      - name: Tricep Pushdown
+        type: dropset
+        sets: 3
+        reps: "to failure"
+        notes: "Perform all drops without rest"
+        drops:
+          - weight: "30kg"
+            reps: "to failure"
+          - weight: "20kg" 
+            reps: "to failure"
+          - weight: "15kg"
+            reps: "to failure"
+
+  - name: Pull Day
+    focus: "Pull"
+    exercises:
+      - name: Deadlift
+        sets: 4
+        reps: 5
+        weight: "120kg"
+        rest: "3min"
+        notes: "Maintain neutral spine"
+        substitutes: ["Romanian deadlift", "Trap bar deadlift"]
+        
+      - name: Pull Up
+        sets: 3
+        reps: "to failure"
+        weight: "BW"
+        rest: "2min"
+        notes: "Use assistance if needed"
+        substitutes: ["Lat pulldown", "Assisted pull-up"]
+
+      - name: Bent Over Row
+        sets: 3
+        reps: 8
+        weight: "60kg"
+        rest: "2min"
+        substitutes: ["T-bar row", "Cable row"]
+
+      # Superset example
+      - type: superset
+        sets: 3
+        rest_between_rounds: "90sec"
+        notes: "Perform exercises back-to-back"
+        exercises:
+          - name: Barbell Bicep Curl
+            reps: 10
+            weight: "25kg"
+            notes: "Strict form, no swinging"
+          - name: Face Pull
+            reps: 15
+            weight: "20kg"
+            notes: "Pull to upper chest"
+
+equipment_needed:
+  primary: ["Barbell", "Dumbbells", "Pull-up bar", "Cable machine"]
+  optional: ["Resistance bands"]
+
+progression:
+  type: "linear"
+  increment: "2.5kg per week"
+  deload:
+    frequency: 4
+    percentage: 90
+
+special_techniques:
+  - name: "Dropsets"
+    description: "Reduce weight immediately after failure"
+    rest_between_drops: "0s"
+  - name: "Supersets" 
+    description: "Two exercises performed back-to-back"
+    rest_between_exercises: "0s"
+
+notes:
+  - "Alternate push and pull days"
+  - "Rest at least 48 hours between same muscle groups"
+  - "Track weights and aim for progressive overload"

@@ -1,0 +1,629 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Workout Program Schema",
+  "description": "Schema for validating workout program YAML files",
+  "type": "object",
+  "required": ["program_name", "workouts"],
+  "properties": {
+    "program_name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "frequency": {
+      "type": "string",
+      "pattern": "^[1-7] days? per week$|^daily$|^every other day$"
+    },
+    "duration": {
+      "type": "string",
+      "pattern": "^\\d+\\s+(days?|weeks?|months?).*$"
+    },
+    "author": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "phases": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/phase"
+      }
+    },
+    "workouts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/workout"
+      }
+    },
+    "equipment_needed": {
+      "$ref": "#/definitions/equipment"
+    },
+    "progression": {
+      "$ref": "#/definitions/progression"
+    },
+    "special_techniques": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/technique"
+      }
+    },
+    "timing_patterns": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/timing_pattern"
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "definitions": {
+    "phase": {
+      "type": "object",
+      "required": ["name", "weeks", "workouts"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "weeks": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 52
+        },
+        "description": {
+          "type": "string"
+        },
+        "workouts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/workout"
+          }
+        }
+      }
+    },
+    "workout": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "focus": {
+          "type": "string",
+          "enum": [
+            "Full Body", "Upper Body", "Lower Body", "Push", "Pull", "Legs",
+            "Chest", "Back", "Shoulders", "Arms", "Core", "Cardio",
+            "Strength", "Hypertrophy", "Endurance", "Power", "Mobility"
+          ]
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/section"
+          }
+        },
+        "exercises": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/exercise"
+          }
+        }
+      }
+    },
+    "section": {
+      "type": "object",
+      "required": ["category", "exercises"],
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": [
+            "Warm Up", "Strength & Condition", "Hypertrophy Focus", 
+            "Swole & Flexy", "Accessories", "Cool Down", "Cardio",
+            "Mobility", "Core", "Power", "Conditioning"
+          ]
+        },
+        "exercises": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/exercise"
+          }
+        }
+      }
+    },
+    "exercise": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/standard_exercise"
+        },
+        {
+          "$ref": "#/definitions/dropset_exercise"
+        },
+        {
+          "$ref": "#/definitions/superset_exercise"
+        },
+        {
+          "$ref": "#/definitions/circuit_exercise"
+        }
+      ]
+    },
+    "standard_exercise": {
+      "type": "object",
+      "required": ["name", "sets", "reps"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sets": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20
+        },
+        "reps": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            {
+              "type": "string",
+              "pattern": "^(\\d+-\\d+|\\d+\\s+e/s|to failure|\\d+sec|\\d+min|max reps)$"
+            }
+          ]
+        },
+        "weight": {
+          "oneOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "string",
+              "pattern": "^(\\d+(\\.\\d+)?\\s*(kg|lbs|g)?|bodyweight|BW|light|moderate|heavy)$"
+            }
+          ]
+        },
+        "rest": {
+          "type": "string",
+          "pattern": "^(\\d+sec|\\d+min|\\d+-\\d+sec|\\d+-\\d+min|0s?)$"
+        },
+        "duration": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "string",
+              "pattern": "^\\d+\\s*(sec|min|s)$|^\\d+\\s+e/s$"
+            }
+          ]
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "substitutes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 5
+        },
+        "timing": {
+          "$ref": "#/definitions/timing"
+        },
+        "variations": {
+          "type": "object",
+          "patternProperties": {
+            "^week_\\d+$": {
+              "$ref": "#/definitions/exercise_variation"
+            }
+          }
+        },
+        "special_technique": {
+          "type": "object",
+          "patternProperties": {
+            "^week_\\d+$": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "dropset_exercise": {
+      "type": "object",
+      "required": ["name", "type", "sets", "drops"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "const": "dropset"
+        },
+        "sets": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "reps": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "string",
+              "enum": ["to failure"]
+            }
+          ]
+        },
+        "notes": {
+          "type": "string"
+        },
+        "drops": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "required": ["weight"],
+            "properties": {
+              "weight": {
+                "oneOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d+)?\\s*(kg|lbs)?$"
+                  }
+                ]
+              },
+              "reps": {
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  {
+                    "type": "string",
+                    "enum": ["to failure"]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "superset_exercise": {
+      "type": "object",
+      "required": ["type", "sets", "exercises"],
+      "properties": {
+        "type": {
+          "const": "superset"
+        },
+        "sets": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "rest_between_rounds": {
+          "type": "string",
+          "pattern": "^\\d+(sec|min|s)$"
+        },
+        "notes": {
+          "type": "string"
+        },
+        "exercises": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "required": ["name", "reps"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reps": {
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^\\d+-\\d+|\\d+\\s+e/s$"
+                  }
+                ]
+              },
+              "weight": {
+                "oneOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d+)?\\s*(kg|lbs)?$"
+                  }
+                ]
+              },
+              "notes": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "circuit_exercise": {
+      "type": "object",
+      "required": ["type", "rounds", "exercises"],
+      "properties": {
+        "type": {
+          "const": "circuit"
+        },
+        "rounds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20
+        },
+        "rest_between_exercises": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 300
+        },
+        "rest_between_rounds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 600
+        },
+        "notes": {
+          "type": "string"
+        },
+        "exercises": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "duration": {
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 5,
+                    "maximum": 600
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^\\d+\\s*(sec|s)|\\d+\\s+e/s$"
+                  }
+                ]
+              },
+              "reps": {
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^\\d+\\s+e/s$"
+                  }
+                ]
+              },
+              "substitutes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "notes": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "timing": {
+      "type": "object",
+      "required": ["pattern"],
+      "properties": {
+        "pattern": {
+          "type": "string",
+          "enum": [
+            "EMOM", "every_X_minutes", "every_X_seconds", "circuit", "rest_pause"
+          ]
+        },
+        "interval": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 600
+        },
+        "duration": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 180
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "exercise_variation": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "reps": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "string",
+              "pattern": "^\\d+-\\d+|\\d+\\s+e/s$"
+            }
+          ]
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "equipment": {
+      "type": "object",
+      "properties": {
+        "primary": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Barbell", "Dumbbells", "Kettlebell", "Pull-up bar", "Bench",
+              "Cable machine", "Resistance bands", "None - bodyweight only",
+              "Leg press", "Smith machine", "TRX", "Gymnastic rings",
+              "Medicine ball", "Foam roller", "Yoga mat"
+            ]
+          }
+        },
+        "optional": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "progression": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["linear", "percentage", "phase_based", "autoregulation", "wave"]
+        },
+        "increment": {
+          "oneOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "string",
+              "pattern": "^\\d+(\\.\\d+)?\\s*(kg|lbs|%)?\\s*(per week|weekly)?$"
+            }
+          ]
+        },
+        "deload": {
+          "type": "object",
+          "properties": {
+            "frequency": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 12
+            },
+            "percentage": {
+              "type": "integer",
+              "minimum": 50,
+              "maximum": 95
+            }
+          }
+        },
+        "phases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "phase": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "focus": {
+                "type": "string"
+              },
+              "load_progression": {
+                "type": "string"
+              },
+              "notes": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "technique": {
+      "type": "object",
+      "required": ["name", "description"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "used_in": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "timing_pattern": {
+      "type": "object",
+      "required": ["name", "description"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "used_in": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
