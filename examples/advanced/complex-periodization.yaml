@@ -1,142 +1,70 @@
-program_name: Advanced 3-Day Full Body Demo
-description: "Demonstration of complex workout program structure with progressive phases"
+program_name: Advanced 3-Day Progressive Program
+description: "Multi-phase program demonstrating progressive overload"
 frequency: "3 days per week"
-author: "Demo Program"
 duration: "12 weeks (3 phases of 4 weeks each)"
 
 phases:
   - name: Phase 1
     weeks: 4
-    description: "Foundation phase with moderate intervals"
+    description: "Foundation phase"
     workouts:
       - name: Day 1
-        focus: "Lower + Upper Push"
-        sections:
-          - category: "Warm Up"
-            exercises:
-              - name: Dynamic Movement A
-                sets: 3
-                reps: 15
-                rest: "0-10s"
-                notes: "Focus on controlled movement quality"
-                substitutes: ["Alternative Movement A"]
-                variations:
-                  week_2: 
-                    name: "Dynamic Movement A-2"
-                    reps: "12 e/s"
-                  week_3:
-                    name: "Dynamic Movement A-3" 
-                    reps: "10 e/s"
-                  week_4:
-                    name: "Dynamic Movement A-4"
-                    notes: "Increase range of motion"
-                    
-              - name: Core Activation
-                sets: 3
-                reps: "8-12"
-                rest: "0-10s"
-                notes: "Maintain neutral spine throughout"
+        focus: "Full Body"
+        exercises:
+          - name: Squat
+            sets: 3
+            reps: "8-12"
+            weight: "60kg"
+            rest: "2min"
+            notes: "Focus on form"
+            substitutes: ["Goblet squat"]
+            
+          - name: Push-up
+            sets: 3
+            reps: 10
+            weight: "bodyweight"
+            rest: "90sec"
+            substitutes: ["Knee push-up"]
 
-          - category: "Strength & Condition"
-            exercises:
-              - name: Primary Lower Exercise
-                sets: 6
-                reps: 5
-                timing:
-                  pattern: "EMOM"
-                  interval: 2
-                  duration: 12
-                  notes: "Start at 60% 1RM, add load each set, peak around set 4-5"
-                substitutes: ["Alternative Lower A", "Alternative Lower B"]
-                
-              - name: Primary Upper Push
-                sets: 6
-                reps: 5
-                timing:
-                  pattern: "EMOM"
-                  interval: 2
-                  duration: 12
-                  notes: "Combined with lower exercise in same timing structure"
-                substitutes: ["Alternative Push A", "Alternative Push B"]
-          - category: "Accessories"
-            exercises:
-              - type: circuit
-                rounds: 5
-                rest_between_exercises: 0
-                rest_between_rounds: 30
-                notes: "Perform exercises back-to-back, rest only between full rounds"
-                exercises:
-                  - name: Locomotion Exercise
-                    duration: 60
-                    substitutes: ["Locomotion Alt A", "Locomotion Alt B"]
-                  - name: Carry Variation
-                    duration: "30 e/s"
-                    notes: "Can be performed stationary if space limited"
+      - name: Day 2
+        focus: "Upper Body"
+        exercises:
+          - name: Pull-up
+            sets: 3
+            reps: "5-8"
+            weight: "bodyweight"
+            rest: "2min"
+            substitutes: ["Lat pulldown"]
 
   - name: Phase 2
     weeks: 4
-    description: "Strength building phase with extended intervals"
+    description: "Strength building phase"
     workouts:
       - name: Day 1
-        focus: "Lower + Upper Push"
-        sections:
-          - category: "Strength & Condition"
-            exercises:
-              - name: Primary Lower Exercise
-                sets: 6
-                reps: 5
-                timing:
-                  pattern: "every_X_minutes"
-                  interval: 4
-                  duration: 12
-                  notes: "5 lower, 5 push, 5 lower pattern. Progressive loading"
-                substitutes: ["Lower Alternative C", "Lower Alternative D"]
+        focus: "Full Body"
+        exercises:
+          - name: Squat
+            sets: 4
+            reps: "6-8"
+            weight: "70kg"
+            rest: "3min"
+            notes: "Increase load from Phase 1"
+            substitutes: ["Goblet squat"]
 
-  - name: Phase 3
-    weeks: 4
-    description: "Peak performance phase with short intervals"
-    workouts:
-      - name: Day 1
-        focus: "Lower + Upper Push"
-        sections:
-          - category: "Strength & Condition"
-            exercises:
-              - name: Primary Lower Exercise
-                sets: 5
-                reps: 5
-                timing:
-                  pattern: "every_X_seconds"
-                  interval: 90
-                  notes: "Build to near-maximal loads by final set"
-                substitutes: ["Lower Alternative E", "Lower Alternative F"]
-
-# Advanced Features
 progression:
   type: "phase_based"
   phases:
     - phase: 1
-      focus: "Movement quality and work capacity"
+      focus: "Movement quality"
       load_progression: "linear"
-    - phase: 2  
+    - phase: 2
       focus: "Strength development"
       load_progression: "moderate increases"
-    - phase: 3
-      focus: "Peak performance"
-      load_progression: "maximal effort focus"
 
-special_techniques:
-  - name: "Modified Tempo"
-    description: "Slow negative, quarter rep, full rep sequence counted as single rep"
-  - name: "Cluster Sets"
-    description: "Perform to failure, rest 10 seconds, then perform to failure again"
+equipment_needed:
+  primary: ["Barbell", "Pull-up bar"]
+  optional: ["Dumbbells"]
 
-timing_patterns:
-  - name: "EMOM (Every Minute on the Minute)"
-    description: "Perform set every X minutes for total duration"
-    used_in: ["Phase 1"]
-  - name: "Every X Minutes"
-    description: "Extended intervals with exercise combinations"
-    used_in: ["Phase 2"]
-  - name: "Every X Seconds"
-    description: "Short intervals for peak intensity"
-    used_in: ["Phase 3"]
+notes:
+  - "Progress through phases systematically"
+  - "Focus on form before adding weight"

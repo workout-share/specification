@@ -3,7 +3,11 @@
   "title": "Workout Program Schema",
   "description": "Schema for validating workout program YAML files",
   "type": "object",
-  "required": ["program_name", "workouts"],
+  "required": ["program_name"],
+  "anyOf": [
+    {"required": ["workouts"]},
+    {"required": ["phases"]}
+  ],
   "properties": {
     "program_name": {
       "type": "string",
@@ -164,6 +168,13 @@
     "standard_exercise": {
       "type": "object",
       "required": ["name", "sets", "reps"],
+      "not": {
+        "anyOf": [
+          {"required": ["type"]},
+          {"required": ["drops"]},
+          {"required": ["exercises"]}
+        ]
+      },
       "properties": {
         "name": {
           "type": "string",
