@@ -1,11 +1,11 @@
-# Contributing to Workout YAML Standard
+# Contributing to Workout Share Standard
 
-Thank you for your interest in contributing! This project aims to create a universal standard for representing workout programs in a human-readable, software-parseable format.
+Thank you for your interest in contributing! This project aims to create a universal standard for representing workout-share programs in a human-readable, software-parseable format.
 
 ## Ways to Contribute
 
 ### 📋 Example Programs
-- Add new workout programs to the `examples/` directory
+- Add new workout-share programs to the `examples/` directory
 - Include programs of varying complexity levels
 - Ensure proper categorization (basic/intermediate/advanced)
 

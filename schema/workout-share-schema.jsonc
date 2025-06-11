@@ -1,92 +1,144 @@
 {
+  // Workout Share Schema v1.0
+  // Official JSON Schema for validating workout-share program files in YAML format
+  // 
+  // This schema ensures consistent, parseable workout-share data that can be
+  // shared between fitness apps via QR codes or direct file exchange.
+  //
+  // Repository: https://github.com/workout-share/specification
+  
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "workout-share schema",
-  "description": "Schema for validating workout-share YAML files",
+  "title": "Workout Share Schema",
+  "description": "Schema for validating workout-share program YAML files in Workout Share Format",
   "type": "object",
+  
+  // Every program must have a name and workouts
   "required": ["program_name", "workouts"],
+  
   "properties": {
     "program_name": {
       "type": "string",
+      "description": "The name of the workout program (e.g., 'Beginner Full Body', 'Advanced Push/Pull Split')",
       "minLength": 1,
-      "maxLength": 100
+      "maxLength": 100,
+      "examples": ["Beginner Full Body", "Advanced Push/Pull Split", "Minimalift 3-Day"]
     },
+    
     "description": {
       "type": "string",
-      "maxLength": 500
+      "description": "Optional description explaining the program's goals and approach",
+      "maxLength": 500,
+      "examples": ["A beginner-friendly full body routine", "Advanced periodized strength program"]
     },
+    
     "frequency": {
       "type": "string",
-      "pattern": "^[1-7] days? per week$|^daily$|^every other day$"
+      "description": "How often to train per week",
+      "pattern": "^[1-7] days? per week$|^daily$|^every other day$",
+      "examples": ["3 days per week", "5 days per week", "daily", "every other day"]
     },
+    
     "duration": {
       "type": "string",
-      "pattern": "^\\d+\\s+(days?|weeks?|months?).*$"
+      "description": "Total program length",
+      "pattern": "^\\d+\\s+(days?|weeks?|months?).*$",
+      "examples": ["8 weeks", "12 weeks", "6 months", "4 weeks per phase"]
     },
+    
     "author": {
       "type": "string",
-      "maxLength": 100
+      "description": "Program creator or source",
+      "maxLength": 100,
+      "examples": ["John Doe", "Fitness App Co.", "Community Contribution"]
     },
+    
     "version": {
       "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+      "description": "Program version using semantic versioning",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "examples": ["1.0.0", "2.1.3"]
     },
+    
+    // Phases are optional - only for complex periodized programs
     "phases": {
       "type": "array",
+      "description": "Optional: Multi-phase programming for periodized training",
       "items": {
         "$ref": "#/definitions/phase"
       }
     },
+    
+    // Workouts are always required - the core of every program
     "workouts": {
       "type": "array",
+      "description": "The workout sessions that make up this program",
       "minItems": 1,
       "items": {
         "$ref": "#/definitions/workout"
       }
     },
+    
     "equipment_needed": {
       "$ref": "#/definitions/equipment"
     },
+    
     "progression": {
       "$ref": "#/definitions/progression"
     },
+    
+    // These provide context and examples for the format
     "special_techniques": {
       "type": "array",
+      "description": "Documentation of special techniques used in this program",
       "items": {
         "$ref": "#/definitions/technique"
       }
     },
+    
     "timing_patterns": {
       "type": "array",
+      "description": "Documentation of timing patterns used in this program", 
       "items": {
         "$ref": "#/definitions/timing_pattern"
       }
     },
+    
     "notes": {
       "type": "array",
+      "description": "General notes and instructions for the program",
       "items": {
         "type": "string"
-      }
+      },
+      "examples": [["Rest 1 day between workouts", "Focus on form over weight"]]
     }
   },
+  
   "definitions": {
     "phase": {
       "type": "object",
+      "description": "A training phase within a periodized program",
       "required": ["name", "weeks", "workouts"],
       "properties": {
         "name": {
           "type": "string",
-          "minLength": 1
+          "description": "Phase name (e.g., 'Foundation', 'Strength Building', 'Peak')",
+          "minLength": 1,
+          "examples": ["Phase 1", "Foundation", "Strength Building", "Peak Performance"]
         },
         "weeks": {
           "type": "integer",
+          "description": "Duration of this phase in weeks",
           "minimum": 1,
           "maximum": 52
         },
         "description": {
-          "type": "string"
+          "type": "string",
+          "description": "What this phase focuses on",
+          "examples": ["Foundation phase with higher reps", "Peak strength development"]
         },
         "workouts": {
           "type": "array",
+          "description": "Workouts specific to this phase",
           "minItems": 1,
           "items": {
             "$ref": "#/definitions/workout"
@@ -94,16 +146,21 @@
         }
       }
     },
+    
     "workout": {
       "type": "object",
+      "description": "A single workout session",
       "required": ["name"],
       "properties": {
         "name": {
           "type": "string",
-          "minLength": 1
+          "description": "Workout name (e.g., 'Upper Body', 'Day 1', 'Push')",
+          "minLength": 1,
+          "examples": ["Day 1", "Upper Body", "Push Day", "Full Body"]
         },
         "focus": {
           "type": "string",
+          "description": "Primary focus or muscle groups targeted",
           "enum": [
             "Full Body", "Upper Body", "Lower Body", "Push", "Pull", "Legs",
             "Chest", "Back", "Shoulders", "Arms", "Core", "Cardio",
@@ -112,24 +169,29 @@
         },
         "sections": {
           "type": "array",
+          "description": "Organized sections within the workout (e.g., warm-up, main work)",
           "items": {
             "$ref": "#/definitions/section"
           }
         },
         "exercises": {
           "type": "array",
+          "description": "Exercises in this workout (if not using sections)",
           "items": {
             "$ref": "#/definitions/exercise"
           }
         }
       }
     },
+    
     "section": {
       "type": "object",
+      "description": "A section within a workout (e.g., warm-up, main work, accessories)",
       "required": ["category", "exercises"],
       "properties": {
         "category": {
           "type": "string",
+          "description": "Type of work in this section",
           "enum": [
             "Warm Up", "Strength & Condition", "Hypertrophy Focus", 
             "Swole & Flexy", "Accessories", "Cool Down", "Cardio",
@@ -138,6 +200,7 @@
         },
         "exercises": {
           "type": "array",
+          "description": "Exercises in this section",
           "minItems": 1,
           "items": {
             "$ref": "#/definitions/exercise"
@@ -145,6 +208,8 @@
         }
       }
     },
+    
+    // Exercise types: standard, dropset, superset, or circuit
     "exercise": {
       "oneOf": [
         {
@@ -161,9 +226,12 @@
         }
       ]
     },
+    
     "standard_exercise": {
       "type": "object",
+      "description": "A standard exercise with sets, reps, and optional parameters",
       "required": ["name", "sets", "reps"],
+      // Ensure this doesn't conflict with special exercise types
       "not": {
         "anyOf": [
           {"required": ["type"]},
@@ -174,10 +242,13 @@
       "properties": {
         "name": {
           "type": "string",
-          "minLength": 1
+          "description": "Exercise name (e.g., 'Squat', 'Push-up', 'Deadlift')",
+          "minLength": 1,
+          "examples": ["Squat", "Push-up", "Deadlift", "Bench Press"]
         },
         "sets": {
           "type": "integer",
+          "description": "Number of sets to perform",
           "minimum": 1,
           "maximum": 20
         },
@@ -185,12 +256,15 @@
           "oneOf": [
             {
               "type": "integer",
+              "description": "Fixed number of repetitions",
               "minimum": 1,
               "maximum": 100
             },
             {
               "type": "string",
-              "pattern": "^(\\d+-\\d+|\\d+\\s+e/s|to failure|\\d+sec|\\d+min|max reps)$"
+              "description": "Rep range, duration, or special instruction",
+              "pattern": "^(\\d+-\\d+|\\d+\\s+e/s|to failure|\\d+sec|\\d+min|max reps)$",
+              "examples": ["8-12", "10 e/s", "to failure", "30sec", "2min"]
             }
           ]
         },
@@ -198,46 +272,59 @@
           "oneOf": [
             {
               "type": "number",
+              "description": "Weight in numeric form",
               "minimum": 0
             },
             {
-              "type": "string",
-              "pattern": "^(\\d+(\\.\\d+)?\\s*(kg|lbs|g)?|bodyweight|BW|light|moderate|heavy)$"
+              "type": "string", 
+              "description": "Weight with units or descriptive (bodyweight, light, etc.)",
+              "pattern": "^(\\d+(\\.\\d+)?\\s*(kg|lbs|g)?|bodyweight|BW|light|moderate|heavy)$",
+              "examples": ["80kg", "25lbs", "bodyweight", "BW", "heavy"]
             }
           ]
         },
         "rest": {
           "type": "string",
-          "pattern": "^(\\d+sec|\\d+min|\\d+-\\d+sec|\\d+-\\d+min|0s?)$"
+          "description": "Rest period between sets",
+          "pattern": "^(\\d+sec|\\d+min|\\d+-\\d+sec|\\d+-\\d+min|0s?)$",
+          "examples": ["60sec", "2min", "90-120sec", "0s"]
         },
         "duration": {
           "oneOf": [
             {
               "type": "integer",
+              "description": "Duration in seconds for time-based exercises",
               "minimum": 1
             },
             {
               "type": "string",
-              "pattern": "^\\d+\\s*(sec|min|s)$|^\\d+\\s+e/s$"
+              "description": "Duration with units or per side",
+              "pattern": "^\\d+\\s*(sec|min|s)$|^\\d+\\s+e/s$",
+              "examples": ["30sec", "2min", "45s", "30 e/s"]
             }
           ]
         },
         "notes": {
           "type": "string",
-          "maxLength": 200
+          "description": "Form cues, technique notes, or special instructions",
+          "maxLength": 200,
+          "examples": ["Focus on controlled descent", "2 second pause at bottom"]
         },
         "substitutes": {
           "type": "array",
+          "description": "Alternative exercises for different equipment or skill levels",
           "items": {
             "type": "string"
           },
-          "maxItems": 5
+          "maxItems": 5,
+          "examples": [["Goblet squat", "Leg press"], ["Push-up", "Incline push-up"]]
         },
         "timing": {
           "$ref": "#/definitions/timing"
         },
         "variations": {
           "type": "object",
+          "description": "Exercise variations for different weeks",
           "patternProperties": {
             "^week_\\d+$": {
               "$ref": "#/definitions/exercise_variation"
@@ -246,16 +333,20 @@
         },
         "special_technique": {
           "type": "object",
+          "description": "Special techniques applied in specific weeks",
           "patternProperties": {
             "^week_\\d+$": {
-              "type": "string"
+              "type": "string",
+              "examples": ["1 & 1/4 reps", "Cluster sets: failure + 10s rest + failure"]
             }
           }
         }
       }
     },
+    
     "dropset_exercise": {
       "type": "object",
+      "description": "Dropset: reduce weight immediately after failure",
       "required": ["name", "type", "sets", "drops"],
       "properties": {
         "name": {
@@ -267,6 +358,7 @@
         },
         "sets": {
           "type": "integer",
+          "description": "Number of dropset sequences to perform",
           "minimum": 1,
           "maximum": 10
         },
@@ -287,6 +379,7 @@
         },
         "drops": {
           "type": "array",
+          "description": "Weight drops performed without rest",
           "minItems": 2,
           "maxItems": 5,
           "items": {
@@ -322,8 +415,10 @@
         }
       }
     },
+    
     "superset_exercise": {
       "type": "object",
+      "description": "Superset: two or more exercises performed back-to-back",
       "required": ["type", "sets", "exercises"],
       "properties": {
         "type": {
@@ -331,11 +426,13 @@
         },
         "sets": {
           "type": "integer",
+          "description": "Number of superset rounds",
           "minimum": 1,
           "maximum": 10
         },
         "rest_between_rounds": {
           "type": "string",
+          "description": "Rest between complete superset rounds",
           "pattern": "^\\d+(sec|min|s)$"
         },
         "notes": {
@@ -343,6 +440,7 @@
         },
         "exercises": {
           "type": "array",
+          "description": "Exercises performed back-to-back (no rest between)",
           "minItems": 2,
           "maxItems": 4,
           "items": {
@@ -385,8 +483,10 @@
         }
       }
     },
+    
     "circuit_exercise": {
-      "type": "object",
+      "type": "object", 
+      "description": "Circuit: multiple exercises performed in sequence with specific timing",
       "required": ["type", "rounds", "exercises"],
       "properties": {
         "type": {
@@ -394,16 +494,19 @@
         },
         "rounds": {
           "type": "integer",
+          "description": "Number of complete circuit rounds",
           "minimum": 1,
           "maximum": 20
         },
         "rest_between_exercises": {
           "type": "integer",
+          "description": "Rest between exercises within a round (seconds)",
           "minimum": 0,
           "maximum": 300
         },
         "rest_between_rounds": {
           "type": "integer",
+          "description": "Rest between complete rounds (seconds)",
           "minimum": 0,
           "maximum": 600
         },
@@ -412,6 +515,7 @@
         },
         "exercises": {
           "type": "array",
+          "description": "Exercises in the circuit",
           "minItems": 2,
           "items": {
             "type": "object",
@@ -425,6 +529,7 @@
                 "oneOf": [
                   {
                     "type": "integer",
+                    "description": "Duration in seconds",
                     "minimum": 5,
                     "maximum": 600
                   },
@@ -460,33 +565,42 @@
         }
       }
     },
+    
+    // Timing patterns for structured workouts (EMOM, etc.)
     "timing": {
       "type": "object",
+      "description": "Structured timing patterns for exercises",
       "required": ["pattern"],
       "properties": {
         "pattern": {
           "type": "string",
+          "description": "Type of timing pattern",
           "enum": [
             "EMOM", "every_X_minutes", "every_X_seconds", "circuit", "rest_pause"
           ]
         },
         "interval": {
           "type": "integer",
+          "description": "Interval in seconds or minutes (based on pattern)",
           "minimum": 1,
           "maximum": 600
         },
         "duration": {
-          "type": "integer",
+          "type": "integer", 
+          "description": "Total duration in minutes",
           "minimum": 1,
           "maximum": 180
         },
         "notes": {
-          "type": "string"
+          "type": "string",
+          "description": "Additional timing instructions"
         }
       }
     },
+    
     "exercise_variation": {
       "type": "object",
+      "description": "Exercise variation for a specific week",
       "properties": {
         "name": {
           "type": "string"
@@ -508,11 +622,15 @@
         }
       }
     },
+    
+    // Equipment requirements
     "equipment": {
       "type": "object",
+      "description": "Equipment needed for this program",
       "properties": {
         "primary": {
           "type": "array",
+          "description": "Essential equipment required",
           "items": {
             "type": "string",
             "enum": [
@@ -525,18 +643,23 @@
         },
         "optional": {
           "type": "array",
+          "description": "Nice-to-have equipment",
           "items": {
             "type": "string"
           }
         }
       }
     },
+    
+    // Progression schemes
     "progression": {
       "type": "object",
+      "description": "How to progress through the program",
       "required": ["type"],
       "properties": {
         "type": {
           "type": "string",
+          "description": "Type of progression scheme",
           "enum": ["linear", "percentage", "phase_based", "autoregulation", "wave"]
         },
         "increment": {
@@ -553,14 +676,17 @@
         },
         "deload": {
           "type": "object",
+          "description": "Deload/recovery week specifications",
           "properties": {
             "frequency": {
               "type": "integer",
+              "description": "Deload every X weeks",
               "minimum": 1,
               "maximum": 12
             },
             "percentage": {
               "type": "integer",
+              "description": "Percentage of normal load during deload",
               "minimum": 50,
               "maximum": 95
             }
@@ -568,6 +694,7 @@
         },
         "phases": {
           "type": "array",
+          "description": "Phase-specific progression details",
           "items": {
             "type": "object",
             "properties": {
@@ -592,40 +719,51 @@
         }
       }
     },
+    
+    // Documentation objects for special techniques
     "technique": {
       "type": "object",
+      "description": "Special training technique documentation",
       "required": ["name", "description"],
       "properties": {
         "name": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "examples": ["Dropsets", "Cluster Sets", "1 & 1/4 Reps"]
         },
         "description": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "examples": ["Reduce weight immediately after failure"]
         },
         "used_in": {
           "type": "array",
+          "description": "Where this technique appears in the program",
           "items": {
             "type": "string"
           }
         }
       }
     },
+    
     "timing_pattern": {
       "type": "object",
+      "description": "Timing pattern documentation",
       "required": ["name", "description"],
       "properties": {
         "name": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "examples": ["EMOM", "Circuit Training", "Rest-Pause"]
         },
         "description": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "examples": ["Every Minute on the Minute - perform set every X minutes"]
         },
         "used_in": {
           "type": "array",
+          "description": "Where this pattern appears in the program",
           "items": {
             "type": "string"
           }

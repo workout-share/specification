@@ -1,8 +1,8 @@
-# Workout Program YAML Format Specification
+# Workout Share YAML Format Specification
 
 ## Overview
 
-The Workout Program YAML Standard defines a human-readable, software-parseable format for representing complex fitness programs. This specification covers all supported fields, data types, and structural patterns.
+The Workout Share YAML Standard defines a human-readable, software-parseable format for representing complex fitness programs. This specification covers all supported fields, data types, and structural patterns.
 
 ## Core Structure
 
