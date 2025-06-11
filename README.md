@@ -12,9 +12,19 @@ Workout Share Format enables seamless sharing of workout programs between fitnes
 
 ## 📁 Repository Contents
 
-- **[Schema](schema/)** - JSON Schema for validation
+- **[Schema](schema/)** - JSON Schema for validation (the authoritative specification)
 - **[Examples](examples/)** - Sample workout programs demonstrating features
-- **[Documentation](docs/)** - Complete format specification and guides
+
+## 📖 Complete Specification
+
+The **[workout-share-schema.jsonc](schema/workout-share-schema.jsonc)** file contains the complete, authoritative specification with:
+- All field definitions and validation rules
+- Pattern matching for time, weight, and rep formats  
+- Complete examples for every field type
+- Detailed comments explaining usage
+- Enum values for controlled vocabularies
+
+For human-readable exploration, start with the [examples](examples/) and refer to the schema comments for detailed field specifications.
 
 ## 🚀 Quick Start
 
