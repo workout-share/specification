@@ -22,7 +22,14 @@ workouts:                       # Required: List of workout sessions
   - name: "String"              # Required: Workout name
     focus: "String"             # Optional: Workout focus/theme
     exercises: []               # Required: List of exercises
+
+phases:                         # Optional: Multi-phase programming
+  - name: "String"              # Required: Phase name
+    weeks: Integer              # Required: Phase duration
+    workouts: []                # Required: Workouts for this phase
 ```
+
+**Note:** All programs must have `workouts` (the core training sessions). `phases` are optional and used for complex periodized programs to show progression over time.
 
 ## Exercise Definition
 
@@ -191,13 +198,14 @@ special_techniques:
 ## Validation Rules
 
 1. **Required Fields**: `program_name`, `workouts`, exercise `name`, `sets`, `reps`
-2. **Exercise Types**: Must specify either individual exercise OR exercise type (dropset, superset, circuit)
-3. **Timing Patterns**: When specified, must include valid `pattern` and appropriate `interval`
-4. **Phase Structure**: If using phases, all workouts must be within phase definitions
-5. **Substitutes**: Must be array of strings (max 5 items)
-6. **Equipment**: Must use predefined equipment enum values
-7. **Patterns**: All time/weight/rep values must match specified regex patterns
-8. **Limits**: Sets (1-20), Reps (1-100), Rounds (1-20), Equipment items (max 5)
+2. **Optional Phases**: `phases` can be included for complex periodized programs
+3. **Exercise Types**: Must specify either individual exercise OR exercise type (dropset, superset, circuit)
+4. **Timing Patterns**: When specified, must include valid `pattern` and appropriate `interval`
+5. **Phase Structure**: If using phases, each phase must contain `workouts`
+6. **Substitutes**: Must be array of strings (max 5 items)
+7. **Equipment**: Must use predefined equipment enum values
+8. **Patterns**: All time/weight/rep values must match specified regex patterns
+9. **Limits**: Sets (1-20), Reps (1-100), Rounds (1-20), Equipment items (max 5)
 
 ## Pattern Validation
 

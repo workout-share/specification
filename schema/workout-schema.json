@@ -1,13 +1,9 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Workout Program Schema",
-  "description": "Schema for validating workout program YAML files",
+  "title": "workout-share schema",
+  "description": "Schema for validating workout-share YAML files",
   "type": "object",
-  "required": ["program_name"],
-  "anyOf": [
-    {"required": ["workouts"]},
-    {"required": ["phases"]}
-  ],
+  "required": ["program_name", "workouts"],
   "properties": {
     "program_name": {
       "type": "string",

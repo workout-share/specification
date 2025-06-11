@@ -3,10 +3,58 @@ description: "Multi-phase program demonstrating progressive overload"
 frequency: "3 days per week"
 duration: "12 weeks (3 phases of 4 weeks each)"
 
+# All programs must have workouts - these represent the current active workouts
+workouts:
+  - name: Day 1
+    focus: "Full Body"
+    exercises:
+      - name: Squat
+        sets: 4
+        reps: "6-8"
+        weight: "70kg"
+        rest: "3min"
+        notes: "Current phase workout"
+        substitutes: ["Goblet squat"]
+        
+      - name: Push-up
+        sets: 3
+        reps: 12
+        weight: "bodyweight"
+        rest: "90sec"
+        substitutes: ["Knee push-up"]
+
+  - name: Day 2
+    focus: "Upper Body"
+    exercises:
+      - name: Pull-up
+        sets: 3
+        reps: "6-8"
+        weight: "bodyweight"
+        rest: "2min"
+        substitutes: ["Lat pulldown"]
+        
+      - name: Bench Press
+        sets: 4
+        reps: "6-8"
+        weight: "80kg"
+        rest: "3min"
+        substitutes: ["Push-up"]
+
+  - name: Day 3
+    focus: "Lower Body"
+    exercises:
+      - name: Deadlift
+        sets: 4
+        reps: 5
+        weight: "100kg"
+        rest: "3min"
+        substitutes: ["Romanian deadlift"]
+
+# Phases are optional - they provide historical/planning context
 phases:
   - name: Phase 1
     weeks: 4
-    description: "Foundation phase"
+    description: "Foundation phase - lighter loads, higher reps"
     workouts:
       - name: Day 1
         focus: "Full Body"
@@ -38,7 +86,7 @@ phases:
 
   - name: Phase 2
     weeks: 4
-    description: "Strength building phase"
+    description: "Strength building phase - moderate loads, moderate reps"
     workouts:
       - name: Day 1
         focus: "Full Body"
@@ -51,20 +99,40 @@ phases:
             notes: "Increase load from Phase 1"
             substitutes: ["Goblet squat"]
 
+  - name: Phase 3
+    weeks: 4
+    description: "Peak strength phase - heavy loads, low reps"
+    workouts:
+      - name: Day 1
+        focus: "Full Body"
+        exercises:
+          - name: Squat
+            sets: 4
+            reps: "4-6"
+            weight: "85kg"
+            rest: "4min"
+            notes: "Peak loading phase"
+            substitutes: ["Goblet squat"]
+
 progression:
   type: "phase_based"
   phases:
     - phase: 1
-      focus: "Movement quality"
+      focus: "Movement quality and conditioning"
       load_progression: "linear"
     - phase: 2
       focus: "Strength development"
       load_progression: "moderate increases"
+    - phase: 3
+      focus: "Peak strength"
+      load_progression: "heavy loading"
 
 equipment_needed:
-  primary: ["Barbell", "Pull-up bar"]
+  primary: ["Barbell", "Pull-up bar", "Bench"]
   optional: ["Dumbbells"]
 
 notes:
+  - "Current workouts represent Phase 2 (active training)"
+  - "Phases show complete 12-week progression"
   - "Progress through phases systematically"
   - "Focus on form before adding weight"
