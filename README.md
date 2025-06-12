@@ -15,16 +15,24 @@ Workout Share Format enables seamless sharing of workout programs between fitnes
 - **[Schema](schema/)** - JSON Schema for validation (the authoritative specification)
 - **[Examples](examples/)** - Sample workout programs demonstrating features
 
+## 🛠️ Development
+
+This project uses [Taskfile.yml](Taskfile.yml) for common development tasks. Run `task --list` to see all available commands, or inspect the Taskfile.yml directly for implementation details.
+
+For releases, use conventional commits and the `prepare-release` task. The changelog is automatically generated using [git-cliff](https://git-cliff.org/).
+
 ## 📖 Complete Specification
 
 The **[workout-share-schema.jsonc](schema/workout-share-schema.jsonc)** file contains the complete, authoritative specification with:
 - All field definitions and validation rules
-- Pattern matching for time, weight, and rep formats  
+- Pattern matching for time, weight, and rep formats
 - Complete examples for every field type
 - Detailed comments explaining usage
 - Enum values for controlled vocabularies
 
 For human-readable exploration, start with the [examples](examples/) and refer to the schema comments for detailed field specifications.
+
+> **Note:** The `.jsonc` file is the source of truth. A JSON version is automatically generated using the `regenerate-schema` task.
 
 ## 🚀 Quick Start
 
@@ -69,7 +77,7 @@ uv run qr_generator.py your-program.yaml
 ## 📖 Documentation
 
 - **[Format Specification](docs/format-spec.md)** - Complete YAML format reference
-- **[Implementation Guide](docs/implementation.md)** - Developer integration guide  
+- **[Implementation Guide](docs/implementation.md)** - Developer integration guide
 - **[QR Code Standard](docs/qr-codes.md)** - Program sharing specification
 
 ## 🔗 Related Projects
@@ -82,7 +90,7 @@ uv run qr_generator.py your-program.yaml
 ### **Exercise Types**
 - Standard exercises with sets, reps, weight, rest
 - Dropsets with multiple weight drops
-- Supersets with back-to-back exercises  
+- Supersets with back-to-back exercises
 - Circuit training with timed rounds
 
 ### **Advanced Programming**
