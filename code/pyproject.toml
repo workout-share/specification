@@ -1,0 +1,16 @@
+[project]
+name = "workout-share-validator"
+version = "0.1.0"
+description = "Validates workout-share format YAML files against JSON Schema"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "jsonschema>=4.24.0",
+    "pyyaml>=6.0.2",
+]
+
+[project.scripts]
+workout-share-validator = "workout_share_validator:main"
+
+[tool.uv]
+dev-dependencies = []

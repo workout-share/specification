@@ -19,23 +19,30 @@ repos:
 
   - repo: local
     hooks:
-      - id: validate-jsonc-schema
-        name: Validate JSONC schema syntax
-        entry: jq empty schema/workout-share-schema.jsonc
+      - id: validate-yaml-schema
+        name: Validate YAML schema syntax
+        entry: yq eval '.' schema/workout-share-schema.yaml
         language: system
-        files: ^schema/workout-share-schema\.jsonc$
+        files: ^schema/workout-share-schema\.yaml$
         pass_filenames: false
 
       - id: regenerate-json-schema
-        name: Regenerate JSON schema from JSONC
-        entry: bash -c 'jq "." schema/workout-share-schema.jsonc > schema/workout-share-schema.json'
+        name: Regenerate JSON schema from YAML
+        entry: bash -c 'yq eval -o=json "." schema/workout-share-schema.yaml > schema/workout-share-schema.json'
         language: system
-        files: ^schema/workout-share-schema\.jsonc$
+        files: ^schema/workout-share-schema\.yaml$
         pass_filenames: false
 
       - id: validate-json-schema
-        name: Validate JSON schema syntax
-        entry: python3 -c "import json; json.load(open('schema/workout-share-schema.json')); print('✅ Schema is valid JSON')"
+        name: Validate generated JSON schema syntax
+        entry: jq empty schema/workout-share-schema.json
         language: system
         files: ^schema/workout-share-schema\.json$
+        pass_filenames: false
+
+      - id: validate-examples
+        name: Validate example workout files
+        entry: bash -c 'cd code && uv run validate.py ../examples'
+        language: system
+        files: ^examples/.*\.ya?ml$
         pass_filenames: false

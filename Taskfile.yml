@@ -1,7 +1,7 @@
 version: '3'
 
 vars:
-  SCHEMA_JSONC: schema/workout-share-schema.jsonc
+  SCHEMA_YAML: schema/workout-share-schema.yaml
   SCHEMA_JSON: schema/workout-share-schema.json
 
 tasks:
@@ -10,113 +10,240 @@ tasks:
     cmds:
       - task --list
 
-  # Schema syntax validation (Type 1: Always available)
-  validate-schema:
-    desc: Validate that our JSON schema file is valid JSON
+  # Schema generation and validation
+  regenerate-schema:
+    desc: Convert YAML schema to JSON
+    cmds:
+      - yq eval -o=json '.' {{.SCHEMA_YAML}} > {{.SCHEMA_JSON}}
+
+  validate-schema-yaml:
+    desc: Validate that our YAML schema file is valid YAML
+    cmds:
+      - yq eval '.' {{.SCHEMA_YAML}} > /dev/null
+
+  validate-schema-json:
+    desc: Validate that our generated JSON schema file is valid JSON
+    deps: [regenerate-schema]
     cmds:
       - jq empty {{.SCHEMA_JSON}}
-    silent: true
 
-  # Workout file validation (Type 2: Requires external tool)
-  validate-examples:
-    desc: Validate example workout files (requires workout-share-validator)
-    deps: [validate-schema]
+  validate-schema:
+    desc: Validate both YAML source and generated JSON schema
+    deps: [validate-schema-yaml, validate-schema-json]
+    cmds:
+      - echo "Schema validation passed"
+
+  # Check dependencies
+  check-deps:
+    desc: Check if required tools are installed
     cmds:
       - |
-        if ! command -v workout-share-validator &> /dev/null; then
-          echo "❌ workout-share-validator not found"
-          echo "Install with: pip install workout-share-validator"
+        echo "Checking dependencies..."
+        missing=""
+
+        if ! command -v yq &> /dev/null; then
+          echo "❌ yq not found"
+          missing="$missing yq"
+        else
+          echo "✅ yq found"
+        fi
+
+        if ! command -v jq &> /dev/null; then
+          echo "❌ jq not found"
+          missing="$missing jq"
+        else
+          echo "✅ jq found"
+        fi
+
+        if ! command -v uv &> /dev/null; then
+          echo "❌ uv not found"
+          missing="$missing uv"
+        else
+          echo "✅ uv found"
+        fi
+
+        if ! command -v pre-commit &> /dev/null; then
+          echo "❌ pre-commit not found"
+          missing="$missing pre-commit"
+        else
+          echo "✅ pre-commit found"
+        fi
+
+        if [ -n "$missing" ]; then
+          echo ""
+          echo "Please install missing dependencies:$missing"
+          echo "  brew install yq jq uv pre-commit"
           exit 1
         fi
-      - find examples/ -name "*.yaml" -exec workout-share-validator {} --schema {{.SCHEMA_JSON}} \; > /dev/null
-      - echo "✅ All examples validated"
-    silent: true
 
-  # Versioning and release tasks
-  check-version:
-    desc: Show next version that would be assigned
+  # Install validation dependencies
+  install-validation:
+    desc: Install Python packages for validation
+    deps: [check-deps]
+    cmds:
+      - cd code && uv sync
+      - echo "✅ Validation dependencies installed"
+
+  # Install pre-commit hooks
+  install-hooks:
+    desc: Install pre-commit hooks
+    deps: [check-deps]
+    cmds:
+      - pre-commit install
+      - pre-commit install --hook-type commit-msg
+      - echo "✅ Pre-commit hooks installed"
+
+  # Quick syntax validation
+  validate-examples:
+    desc: Quick YAML syntax validation of example workout files
+    cmds:
+      - |
+        echo "Validating workout file syntax..."
+        for file in examples/**/*.yaml; do
+          echo "  Checking $(basename "$file")..."
+          if yq eval '.' "$file" > /dev/null 2>&1; then
+            echo "    ✅ Valid YAML syntax"
+          else
+            echo "    ❌ Invalid YAML syntax"
+            exit 1
+          fi
+        done
+        echo "All examples have valid YAML syntax!"
+
+  # Full JSON Schema validation
+  validate-examples-full:
+    desc: Full JSON Schema validation of example workout files
+    deps: [validate-schema, install-validation]
+    cmds:
+      - cd code && uv run validate.py ../examples
+
+  validate-file:
+    desc: Validate a specific workout file (usage - task validate-file -- path/to/file.yaml)
+    deps: [validate-schema, install-validation]
+    cmds:
+      - |
+        if [ "{{.CLI_ARGS}}" = "" ]; then
+          echo "Usage: task validate-file -- path/to/file.yaml"
+          exit 1
+        fi
+        cd code && uv run validate.py "../{{.CLI_ARGS}}"
+
+  # Basic structure check
+  check-workout-structure:
+    desc: Basic structure check for workout files (requires program_name and workouts)
+    cmds:
+      - |
+        echo "Checking basic workout file structure..."
+        for file in examples/**/*.yaml; do
+          echo "  Checking $(basename "$file")..."
+          if yq eval '.program_name' "$file" > /dev/null 2>&1 && yq eval '.workouts' "$file" > /dev/null 2>&1; then
+            echo "    ✅ Has required fields (program_name, workouts)"
+          else
+            echo "    ❌ Missing required fields"
+            exit 1
+          fi
+        done
+        echo "All examples have required structure!"
+
+  # Release management with git-cliff
+  preview-version:
+    desc: Show what the next version would be
     cmds:
       - git-cliff --bumped-version
-    silent: true
 
-  preview-changelog:
-    desc: Preview changelog for next version
+  preview-release:
+    desc: Preview the changelog for the next release
     cmds:
       - git-cliff --bump
 
-  prepare-release:
-    desc: Prepare release by validating schema and checking version
-    deps: [validate-schema]
-    cmds:
-      - echo "Next version:" && git-cliff --bumped-version
-
   release:
     desc: Create a release with changelog and git tag
-    deps: [prepare-release]
+    deps: [validate-schema, validate-examples-full]
     cmds:
+      - task regenerate-schema
       - git-cliff --bump -o CHANGELOG.md
-      - git add CHANGELOG.md {{.SCHEMA_JSON}} VERSION
+      - git add CHANGELOG.md {{.SCHEMA_YAML}} {{.SCHEMA_JSON}} VERSION
       - |
         VERSION=$(git-cliff --bumped-version)
         git commit -m "chore(release): prepare for v$VERSION"
         git tag -a "v$VERSION" -m "Release v$VERSION"
       - echo "✅ Release v$(git-cliff --bumped-version) created"
-      - echo "Push with git push origin main && git push origin --tags"
-
-  # Commit helpers
-  feat:
-    desc: Create a feat commit (usage - task feat -- "add new field")
-    cmds:
-      - |
-        if [ "{{.CLI_ARGS}}" = "" ]; then
-          echo "Usage: task feat -- \"description of feature\""
-          exit 1
-        fi
-        git add -A
-        git commit -m "feat: {{.CLI_ARGS}}"
-
-  fix:
-    desc: Create a fix commit (usage - task fix -- "resolve validation issue")
-    cmds:
-      - |
-        if [ "{{.CLI_ARGS}}" = "" ]; then
-          echo "Usage: task fix -- \"description of fix\""
-          exit 1
-        fi
-        git add -A
-        git commit -m "fix: {{.CLI_ARGS}}"
-
-  docs:
-    desc: Create a docs commit (usage - task docs -- "update examples")
-    cmds:
-      - |
-        if [ "{{.CLI_ARGS}}" = "" ]; then
-          echo "Usage: task docs -- \"description of documentation change\""
-          exit 1
-        fi
-        git add -A
-        git commit -m "docs: {{.CLI_ARGS}}"
-
-  chore:
-    desc: Create a chore commit (usage - task chore -- "update dependencies")
-    cmds:
-      - |
-        if [ "{{.CLI_ARGS}}" = "" ]; then
-          echo "Usage: task chore -- \"description of maintenance task\""
-          exit 1
-        fi
-        git add -A
-        git commit -m "chore: {{.CLI_ARGS}}"
+      - echo "Push with git push origin main and git push origin --tags"
 
   # Setup tasks
-  install-hooks:
-    desc: Install pre-commit hooks
-    cmds:
-      - pre-commit install
-    silent: true
-
   setup:
-    desc: Setup development environment
-    deps: [install-hooks, validate-schema]
+    desc: Setup development environment with full validation
+    deps: [validate-schema, install-validation, install-hooks]
     cmds:
-      - echo "✅ Development environment ready"
+      - echo "Development environment ready"
+      - echo "Schema source:" {{.SCHEMA_YAML}}
+      - echo "Generated JSON:" {{.SCHEMA_JSON}}
+      - echo ""
+      - echo "Available commands:"
+      - echo "  task validate-examples      - Quick syntax validation"
+      - echo "  task validate-examples-full - Full JSON Schema validation"
+      - echo "  task check-workout-structure - Basic structure checks"
+
+  # =====================
+  # TASK ALIASES
+  # =====================
+
+  # Setup aliases
+  s:
+    desc: "[ALIAS] setup"
+    cmds:
+      - task setup
+
+  # Schema aliases
+  rs:
+    desc: "[ALIAS] regenerate-schema"
+    cmds:
+      - task regenerate-schema
+
+  vs:
+    desc: "[ALIAS] validate-schema"
+    cmds:
+      - task validate-schema
+
+  # Validation aliases
+  ve:
+    desc: "[ALIAS] validate-examples (quick syntax)"
+    cmds:
+      - task validate-examples
+
+  vef:
+    desc: "[ALIAS] validate-examples-full (JSON Schema)"
+    cmds:
+      - task validate-examples-full
+
+  vf:
+    desc: "[ALIAS] validate-file -- <path>"
+    cmds:
+      - task validate-file -- {{.CLI_ARGS}}
+
+  cws:
+    desc: "[ALIAS] check-workout-structure"
+    cmds:
+      - task check-workout-structure
+
+  # Release aliases
+  pv:
+    desc: "[ALIAS] preview-version"
+    cmds:
+      - task preview-version
+
+  pr:
+    desc: "[ALIAS] preview-release"
+    cmds:
+      - task preview-release
+
+  rel:
+    desc: "[ALIAS] release"
+    cmds:
+      - task release
+
+  # Dependency check alias
+  cd:
+    desc: "[ALIAS] check-deps"
+    cmds:
+      - task check-deps
