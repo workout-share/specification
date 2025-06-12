@@ -1,0 +1,132 @@
+version: '3'
+
+vars:
+  PROJECT_NAME: workout-share-specification
+  SCHEMA_FILE: schema/workout-share-schema.jsonc
+  JSON_SCHEMA_FILE: schema/workout-share-schema.json
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+
+  # Development tasks
+  validate-schema:
+    desc: Validate the JSONC schema syntax
+    cmds:
+      - echo "✅ Validating JSONC schema syntax..."
+      - python3 -c "import json; json.loads(open('{{.JSON_SCHEMA_FILE}}').read()); print('Schema is valid JSON')"
+
+  regenerate-schema:
+    desc: Regenerate JSON schema from JSONC source
+    deps: [validate-schema]
+    cmds:
+      - echo "🔄 Regenerating JSON schema from JSONC..."
+      - cd ../tools && uv run strip-comments.py ../specification/{{.SCHEMA_FILE}} > ../specification/{{.JSON_SCHEMA_FILE}}
+      - echo "✅ Schema regenerated"
+    sources:
+      - "{{.SCHEMA_FILE}}"
+    generates:
+      - "{{.JSON_SCHEMA_FILE}}"
+
+  # Git workflow tasks
+  check-version:
+    desc: Show next version that would be assigned
+    cmds:
+      - echo "📊 Next version would be:"
+      - git-cliff --bumped-version
+
+  preview-changelog:
+    desc: Preview changelog for next version
+    cmds:
+      - echo "📖 Preview of next changelog:"
+      - git-cliff --bump
+
+  # Release tasks
+  prepare-release:
+    desc: Prepare release by regenerating schema and previewing changelog
+    deps: [regenerate-schema, check-version]
+    cmds:
+      - echo "🚀 Release preparation complete!"
+      - echo "Next version:" && git-cliff --bumped-version
+
+  release:
+    desc: Create a release with changelog and git tag
+    deps: [prepare-release]
+    cmds:
+      - echo "📝 Generating changelog..."
+      - git-cliff --bump -o CHANGELOG.md
+      - echo "📋 Adding changelog to git..."
+      - git add CHANGELOG.md {{.JSON_SCHEMA_FILE}}
+      - |
+        VERSION=$(git-cliff --bumped-version)
+        git commit -m "chore(release): prepare for v$VERSION"
+      - echo "🏷️ Creating git tag..."
+      - |
+        VERSION=$(git-cliff --bumped-version)
+        git tag -a "v$VERSION" -m "Release v$VERSION"
+      - echo "✅ Release created!"
+      - echo "📤 Push with:"
+      - echo "  git push origin main"
+      - echo "  git push origin --tags"
+
+  # Commit helpers
+  feat:
+    desc: Create a feat commit (usage - task feat -- "add new field")
+    cmds:
+      - |
+        if [ "{{.CLI_ARGS}}" = "" ]; then
+          echo "Usage: task feat -- \"description of feature\""
+          exit 1
+        fi
+        git add -A
+        git commit -m "feat: {{.CLI_ARGS}}"
+
+  fix:
+    desc: Create a fix commit (usage - task fix -- "resolve validation issue")
+    cmds:
+      - |
+        if [ "{{.CLI_ARGS}}" = "" ]; then
+          echo "Usage: task fix -- \"description of fix\""
+          exit 1
+        fi
+        git add -A
+        git commit -m "fix: {{.CLI_ARGS}}"
+
+  docs:
+    desc: Create a docs commit (usage - task docs -- "update examples")
+    cmds:
+      - |
+        if [ "{{.CLI_ARGS}}" = "" ]; then
+          echo "Usage: task docs -- \"description of documentation change\""
+          exit 1
+        fi
+        git add -A
+        git commit -m "docs: {{.CLI_ARGS}}"
+
+  chore:
+    desc: Create a chore commit (usage - task chore -- "update dependencies")
+    cmds:
+      - |
+        if [ "{{.CLI_ARGS}}" = "" ]; then
+          echo "Usage: task chore -- \"description of maintenance task\""
+          exit 1
+        fi
+        git add -A
+        git commit -m "chore: {{.CLI_ARGS}}"
+
+  # Setup tasks
+  install-hooks:
+    desc: Install pre-commit hooks
+    cmds:
+      - echo "🪝 Installing pre-commit hooks..."
+      - pre-commit install
+      - pre-commit install --hook-type commit-msg
+      - echo "✅ Pre-commit hooks installed"
+
+  setup:
+    desc: Setup development environment
+    deps: [install-hooks]
+    cmds:
+      - echo "🎯 Development environment ready!"

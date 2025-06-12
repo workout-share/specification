@@ -1,0 +1,34 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: ['--unsafe']  # Allow YAML with custom tags
+      - id: check-json
+      - id: check-added-large-files
+      - id: check-merge-conflict
+
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.1.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args: [feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert]
+
+  - repo: local
+    hooks:
+      - id: regenerate-json-schema
+        name: Regenerate JSON schema from JSONC
+        entry: bash -c 'cd ../tools && uv run strip-comments.py ../specification/schema/workout-share-schema.jsonc > ../specification/schema/workout-share-schema.json'
+        language: system
+        files: ^schema/workout-share-schema\.jsonc$
+        pass_filenames: false
+
+      - id: validate-json-schema
+        name: Validate JSON schema syntax
+        entry: python3 -c "import json; json.load(open('schema/workout-share-schema.json')); print('✅ Schema is valid JSON')"
+        language: system
+        files: ^schema/workout-share-schema\.json$
+        pass_filenames: false
