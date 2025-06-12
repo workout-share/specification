@@ -16,17 +16,20 @@ tasks:
     aliases: [rs]
     cmds:
       - yq eval -o=json '.' {{.SCHEMA_YAML}} > {{.SCHEMA_JSON}}
+    silent: true
 
   validate-schema-yaml:
     desc: Validate that our YAML schema file is valid YAML
     cmds:
       - yq eval '.' {{.SCHEMA_YAML}} > /dev/null
+    silent: true
 
   validate-schema-json:
     desc: Validate that our generated JSON schema file is valid JSON
     deps: [regenerate-schema]
     cmds:
       - jq empty {{.SCHEMA_JSON}}
+    silent: true
 
   validate-schema:
     desc: Validate both YAML source and generated JSON schema
@@ -86,6 +89,7 @@ tasks:
     cmds:
       - cd code && uv sync
       - echo "✅ Validation dependencies installed"
+    silent: true
 
   # Install pre-commit hooks
   install-hooks:
@@ -95,6 +99,7 @@ tasks:
       - pre-commit install
       - pre-commit install --hook-type commit-msg
       - echo "✅ Pre-commit hooks installed"
+    silent: true
 
   # Quick syntax validation
   validate-examples:
@@ -168,9 +173,8 @@ tasks:
   release:
     desc: Create a release with changelog and git tag
     aliases: [rel]
-    deps: [validate-schema, validate-examples-full]
+    deps: [validate-examples-full]  # This already includes schema validation
     cmds:
-      - task regenerate-schema
       - git-cliff --bump -o CHANGELOG.md
       - git add CHANGELOG.md {{.SCHEMA_YAML}} {{.SCHEMA_JSON}} VERSION
       - |
