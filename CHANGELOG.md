@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.1] - 2025-06-12
+
+### 🚜 Refactor
+
+- Use proper Taskfile aliases instead of separate alias tasks
+
+### ⚙️ Miscellaneous Tasks
+
+- Add comprehensive .gitignore for Python and dev files
+
 ## [0.1.0] - 2025-06-12
 
 ### 🚀 Features
