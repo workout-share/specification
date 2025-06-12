@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [0.1.1] - 2025-06-12
 
+### 🐛 Bug Fixes
+
+- Reduce verbose task output with silent flags
+
 ### 🚜 Refactor
 
 - Use proper Taskfile aliases instead of separate alias tasks
