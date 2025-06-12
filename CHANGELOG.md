@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### 🐛 Bug Fixes
 
 - Reduce verbose task output with silent flags
+- Prevent version tag corruption with v prefix handling
 
 ### 🚜 Refactor
 
