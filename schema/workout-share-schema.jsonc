@@ -1,5 +1,5 @@
 {
-  // Workout Share Schema v1.0
+  // Workout Share Schema v0.1.0
   // Official JSON Schema for validating workout-share program files in YAML format
   // 
   // This schema ensures consistent, parseable workout-share data that can be
