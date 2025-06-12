@@ -47,7 +47,7 @@ workouts:
         drops:
           - weight: "30kg"
             reps: "to failure"
-          - weight: "20kg" 
+          - weight: "20kg"
             reps: "to failure"
           - weight: "15kg"
             reps: "to failure"
@@ -62,7 +62,7 @@ workouts:
         rest: "3min"
         notes: "Maintain neutral spine"
         substitutes: ["Romanian deadlift", "Trap bar deadlift"]
-        
+
       - name: Pull Up
         sets: 3
         reps: "to failure"
@@ -108,7 +108,7 @@ special_techniques:
   - name: "Dropsets"
     description: "Reduce weight immediately after failure"
     rest_between_drops: "0s"
-  - name: "Supersets" 
+  - name: "Supersets"
     description: "Two exercises performed back-to-back"
     rest_between_exercises: "0s"
 

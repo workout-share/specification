@@ -15,7 +15,7 @@ workouts:
         rest: "3min"
         notes: "Current phase workout"
         substitutes: ["Goblet squat"]
-        
+
       - name: Push-up
         sets: 3
         reps: 12
@@ -32,7 +32,7 @@ workouts:
         weight: "bodyweight"
         rest: "2min"
         substitutes: ["Lat pulldown"]
-        
+
       - name: Bench Press
         sets: 4
         reps: "6-8"
@@ -66,7 +66,7 @@ phases:
             rest: "2min"
             notes: "Focus on form"
             substitutes: ["Goblet squat"]
-            
+
           - name: Push-up
             sets: 3
             reps: 10

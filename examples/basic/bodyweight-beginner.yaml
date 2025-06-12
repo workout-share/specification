@@ -60,7 +60,7 @@ workouts:
 
 equipment_needed:
   primary: ["None - bodyweight only"]
-  
+
 progression:
   type: "linear"
   notes: "Add 1-2 reps per exercise each week"
