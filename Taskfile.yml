@@ -178,10 +178,14 @@ tasks:
       - git-cliff --bump -o CHANGELOG.md
       - git add CHANGELOG.md {{.SCHEMA_YAML}} {{.SCHEMA_JSON}} VERSION
       - |
-        VERSION=$(git-cliff --bumped-version)
+        FULL_VERSION=$(git-cliff --bumped-version)
+        VERSION=${FULL_VERSION#v}  # Strip 'v' prefix if present
         git commit -m "chore(release): prepare for v$VERSION"
         git tag -a "v$VERSION" -m "Release v$VERSION"
-      - echo "✅ Release v$(git-cliff --bumped-version) created"
+      - |
+        FULL_VERSION=$(git-cliff --bumped-version)
+        VERSION=${FULL_VERSION#v}  # Strip 'v' prefix if present
+        echo "✅ Release v$VERSION created"
       - echo "Push with git push origin main and git push origin --tags"
 
   # Setup tasks
