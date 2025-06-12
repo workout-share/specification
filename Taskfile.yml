@@ -13,6 +13,7 @@ tasks:
   # Schema generation and validation
   regenerate-schema:
     desc: Convert YAML schema to JSON
+    aliases: [rs]
     cmds:
       - yq eval -o=json '.' {{.SCHEMA_YAML}} > {{.SCHEMA_JSON}}
 
@@ -29,6 +30,7 @@ tasks:
 
   validate-schema:
     desc: Validate both YAML source and generated JSON schema
+    aliases: [vs]
     deps: [validate-schema-yaml, validate-schema-json]
     cmds:
       - echo "Schema validation passed"
@@ -36,6 +38,7 @@ tasks:
   # Check dependencies
   check-deps:
     desc: Check if required tools are installed
+    aliases: [cd]
     cmds:
       - |
         echo "Checking dependencies..."
@@ -96,6 +99,7 @@ tasks:
   # Quick syntax validation
   validate-examples:
     desc: Quick YAML syntax validation of example workout files
+    aliases: [ve]
     cmds:
       - |
         echo "Validating workout file syntax..."
@@ -113,12 +117,14 @@ tasks:
   # Full JSON Schema validation
   validate-examples-full:
     desc: Full JSON Schema validation of example workout files
+    aliases: [vef]
     deps: [validate-schema, install-validation]
     cmds:
       - cd code && uv run validate.py ../examples
 
   validate-file:
     desc: Validate a specific workout file (usage - task validate-file -- path/to/file.yaml)
+    aliases: [vf]
     deps: [validate-schema, install-validation]
     cmds:
       - |
@@ -131,6 +137,7 @@ tasks:
   # Basic structure check
   check-workout-structure:
     desc: Basic structure check for workout files (requires program_name and workouts)
+    aliases: [cws]
     cmds:
       - |
         echo "Checking basic workout file structure..."
@@ -148,16 +155,19 @@ tasks:
   # Release management with git-cliff
   preview-version:
     desc: Show what the next version would be
+    aliases: [pv]
     cmds:
       - git-cliff --bumped-version
 
   preview-release:
     desc: Preview the changelog for the next release
+    aliases: [pr]
     cmds:
       - git-cliff --bump
 
   release:
     desc: Create a release with changelog and git tag
+    aliases: [rel]
     deps: [validate-schema, validate-examples-full]
     cmds:
       - task regenerate-schema
@@ -173,6 +183,7 @@ tasks:
   # Setup tasks
   setup:
     desc: Setup development environment with full validation
+    aliases: [s]
     deps: [validate-schema, install-validation, install-hooks]
     cmds:
       - echo "Development environment ready"
@@ -183,67 +194,3 @@ tasks:
       - echo "  task validate-examples      - Quick syntax validation"
       - echo "  task validate-examples-full - Full JSON Schema validation"
       - echo "  task check-workout-structure - Basic structure checks"
-
-  # =====================
-  # TASK ALIASES
-  # =====================
-
-  # Setup aliases
-  s:
-    desc: "[ALIAS] setup"
-    cmds:
-      - task setup
-
-  # Schema aliases
-  rs:
-    desc: "[ALIAS] regenerate-schema"
-    cmds:
-      - task regenerate-schema
-
-  vs:
-    desc: "[ALIAS] validate-schema"
-    cmds:
-      - task validate-schema
-
-  # Validation aliases
-  ve:
-    desc: "[ALIAS] validate-examples (quick syntax)"
-    cmds:
-      - task validate-examples
-
-  vef:
-    desc: "[ALIAS] validate-examples-full (JSON Schema)"
-    cmds:
-      - task validate-examples-full
-
-  vf:
-    desc: "[ALIAS] validate-file -- <path>"
-    cmds:
-      - task validate-file -- {{.CLI_ARGS}}
-
-  cws:
-    desc: "[ALIAS] check-workout-structure"
-    cmds:
-      - task check-workout-structure
-
-  # Release aliases
-  pv:
-    desc: "[ALIAS] preview-version"
-    cmds:
-      - task preview-version
-
-  pr:
-    desc: "[ALIAS] preview-release"
-    cmds:
-      - task preview-release
-
-  rel:
-    desc: "[ALIAS] release"
-    cmds:
-      - task release
-
-  # Dependency check alias
-  cd:
-    desc: "[ALIAS] check-deps"
-    cmds:
-      - task check-deps
