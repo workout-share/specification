@@ -19,9 +19,16 @@ repos:
 
   - repo: local
     hooks:
+      - id: validate-jsonc-schema
+        name: Validate JSONC schema syntax
+        entry: jq empty schema/workout-share-schema.jsonc
+        language: system
+        files: ^schema/workout-share-schema\.jsonc$
+        pass_filenames: false
+
       - id: regenerate-json-schema
         name: Regenerate JSON schema from JSONC
-        entry: bash -c 'cd ../tools && uv run strip-comments.py ../specification/schema/workout-share-schema.jsonc > ../specification/schema/workout-share-schema.json'
+        entry: bash -c 'jq "." schema/workout-share-schema.jsonc > schema/workout-share-schema.json'
         language: system
         files: ^schema/workout-share-schema\.jsonc$
         pass_filenames: false

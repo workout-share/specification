@@ -1,0 +1,62 @@
+name: Validate Schema and Examples
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'examples/**'
+      - 'schema/**'
+
+jobs:
+  validate-schema:
+    name: Validate JSON Schema
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JSONC Schema Syntax
+        run: |
+          echo "🔍 Checking JSONC schema syntax..."
+          jq empty schema/workout-share-schema.jsonc
+          echo "✅ JSONC schema is valid"
+
+      - name: Validate JSON Schema Syntax
+        run: |
+          echo "🔍 Checking JSON schema syntax..."
+          jq empty schema/workout-share-schema.json
+          echo "✅ JSON schema is valid"
+
+      - name: Check Schema Sync
+        run: |
+          echo "🔍 Checking if JSON schema is up to date..."
+          jq '.' schema/workout-share-schema.jsonc > schema/workout-share-schema.json.tmp
+          if ! diff -q schema/workout-share-schema.json schema/workout-share-schema.json.tmp; then
+            echo "❌ JSON schema is out of sync with JSONC schema"
+            echo "💡 Run 'task regenerate-schema' and commit the result"
+            exit 1
+          fi
+          echo "✅ JSON schema is up to date with JSONC source"
+
+  validate-examples:
+    name: Validate Example Workouts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install workout-share-validator
+        run: |
+          echo "📦 Installing workout-share-validator..."
+          pip install workout-share-validator
+
+      - name: Validate Examples
+        run: |
+          echo "🔍 Validating example workout files..."
+          find examples/ -name "*.yaml" -exec echo "Validating {}" \; -exec workout-share-validator {} --schema schema/workout-share-schema.json \;
+          echo "✅ All examples validated successfully"

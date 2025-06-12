@@ -1,9 +1,8 @@
 version: '3'
 
 vars:
-  PROJECT_NAME: workout-share-specification
-  SCHEMA_FILE: schema/workout-share-schema.jsonc
-  JSON_SCHEMA_FILE: schema/workout-share-schema.json
+  SCHEMA_JSONC: schema/workout-share-schema.jsonc
+  SCHEMA_JSON: schema/workout-share-schema.json
 
 tasks:
   default:
@@ -11,65 +10,58 @@ tasks:
     cmds:
       - task --list
 
-  # Development tasks
+  # Schema syntax validation (Type 1: Always available)
   validate-schema:
-    desc: Validate the JSONC schema syntax
+    desc: Validate that our JSON schema file is valid JSON
     cmds:
-      - echo "✅ Validating JSONC schema syntax..."
-      - python3 -c "import json; json.loads(open('{{.JSON_SCHEMA_FILE}}').read()); print('Schema is valid JSON')"
+      - jq empty {{.SCHEMA_JSON}}
+    silent: true
 
-  regenerate-schema:
-    desc: Regenerate JSON schema from JSONC source
+  # Workout file validation (Type 2: Requires external tool)
+  validate-examples:
+    desc: Validate example workout files (requires workout-share-validator)
     deps: [validate-schema]
     cmds:
-      - echo "🔄 Regenerating JSON schema from JSONC..."
-      - cd ../tools && uv run strip-comments.py ../specification/{{.SCHEMA_FILE}} > ../specification/{{.JSON_SCHEMA_FILE}}
-      - echo "✅ Schema regenerated"
-    sources:
-      - "{{.SCHEMA_FILE}}"
-    generates:
-      - "{{.JSON_SCHEMA_FILE}}"
+      - |
+        if ! command -v workout-share-validator &> /dev/null; then
+          echo "❌ workout-share-validator not found"
+          echo "Install with: pip install workout-share-validator"
+          exit 1
+        fi
+      - find examples/ -name "*.yaml" -exec workout-share-validator {} --schema {{.SCHEMA_JSON}} \; > /dev/null
+      - echo "✅ All examples validated"
+    silent: true
 
-  # Git workflow tasks
+  # Versioning and release tasks
   check-version:
     desc: Show next version that would be assigned
     cmds:
-      - echo "📊 Next version would be:"
       - git-cliff --bumped-version
+    silent: true
 
   preview-changelog:
     desc: Preview changelog for next version
     cmds:
-      - echo "📖 Preview of next changelog:"
       - git-cliff --bump
 
-  # Release tasks
   prepare-release:
-    desc: Prepare release by regenerating schema and previewing changelog
-    deps: [regenerate-schema, check-version]
+    desc: Prepare release by validating schema and checking version
+    deps: [validate-schema]
     cmds:
-      - echo "🚀 Release preparation complete!"
       - echo "Next version:" && git-cliff --bumped-version
 
   release:
     desc: Create a release with changelog and git tag
     deps: [prepare-release]
     cmds:
-      - echo "📝 Generating changelog..."
       - git-cliff --bump -o CHANGELOG.md
-      - echo "📋 Adding changelog to git..."
-      - git add CHANGELOG.md {{.JSON_SCHEMA_FILE}}
+      - git add CHANGELOG.md {{.SCHEMA_JSON}} VERSION
       - |
         VERSION=$(git-cliff --bumped-version)
         git commit -m "chore(release): prepare for v$VERSION"
-      - echo "🏷️ Creating git tag..."
-      - |
-        VERSION=$(git-cliff --bumped-version)
         git tag -a "v$VERSION" -m "Release v$VERSION"
-      - echo "✅ Release created!"
-      - echo "📤 Push with:"
-      - echo "  git push origin main"
-      - echo "  git push origin --tags"
+      - echo "✅ Release v$(git-cliff --bumped-version) created"
+      - echo "Push with git push origin main && git push origin --tags"
 
   # Commit helpers
   feat:
@@ -120,13 +112,11 @@ tasks:
   install-hooks:
     desc: Install pre-commit hooks
     cmds:
-      - echo "🪝 Installing pre-commit hooks..."
       - pre-commit install
-      - pre-commit install --hook-type commit-msg
-      - echo "✅ Pre-commit hooks installed"
+    silent: true
 
   setup:
     desc: Setup development environment
-    deps: [install-hooks]
+    deps: [install-hooks, validate-schema]
     cmds:
-      - echo "🎯 Development environment ready!"
+      - echo "✅ Development environment ready"

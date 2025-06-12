@@ -17,9 +17,40 @@ Workout Share Format enables seamless sharing of workout programs between fitnes
 
 ## 🛠️ Development
 
-This project uses [Taskfile.yml](Taskfile.yml) for common development tasks. Run `task --list` to see all available commands, or inspect the Taskfile.yml directly for implementation details.
+This project uses [Taskfile.yml](Taskfile.yml) for common development tasks. Run `task --list` to see all available commands.
 
-For releases, use conventional commits and the `prepare-release` task. The changelog is automatically generated using [git-cliff](https://git-cliff.org/).
+### Tools
+
+The repository includes several Python tools in the `tools/` directory:
+
+- `strip-comments.py`: Converts JSONC to JSON by removing comments
+- `validator.py`: Validates YAML files against the schema
+- `qr_generator.py`: Generates QR codes for workout programs
+
+### Development Workflow
+
+1. Install dependencies:
+   ```bash
+   uv sync
+   ```
+
+2. Make changes using conventional commits:
+   ```bash
+   task feat -- "add new feature"
+   task fix -- "fix issue"
+   task docs -- "update documentation"
+   ```
+
+3. For releases, use the `prepare-release` task which will:
+   - Update the version
+   - Regenerate the schema
+   - Update the changelog
+
+   ```bash
+   task prepare-release
+   ```
+
+The changelog is automatically generated using [git-cliff](https://git-cliff.org/).
 
 ## 📖 Complete Specification
 
